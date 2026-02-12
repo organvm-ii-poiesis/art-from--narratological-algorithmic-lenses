@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import math
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
@@ -269,7 +269,6 @@ class NarrativeVisualizationEngine:
         root = ET.Element("g", {"id": "comparison"})
 
         for i, name in enumerate(names):
-            model = self.get_model(name)
             sub_engine = NarrativeVisualizationEngine(
                 width=int(col_width),
                 height=self.height,
@@ -420,7 +419,6 @@ class NarrativeVisualizationEngine:
 
     def _layout_scattered(self, model: NarrativeModel) -> list[StagePosition]:
         """Deliberately scatter stages to represent temporal displacement."""
-        n = len(model.stages)
         positions = []
         # Use a deterministic but non-sequential scatter pattern
         scatter_offsets = [
