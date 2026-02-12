@@ -18,10 +18,7 @@ from art_from_narratological_lenses.narrative_engine import (
     NarrativeVisualizationEngine,
     StagePosition,
 )
-from art_from_narratological_lenses.lens_renderer import (
-    AVAILABLE_LENSES,
-    LensRenderer,
-)
+from art_from_narratological_lenses.lens_renderer import LensRenderer
 
 
 @pytest.fixture
