@@ -7,13 +7,11 @@ different lenses produces different visual experiences.
 
 from __future__ import annotations
 
-import json
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from typing import Literal
 
 from art_from_narratological_lenses.narrative_engine import (
-    NARRATIVE_MODELS,
     NarrativeVisualizationEngine,
     StagePosition,
 )
