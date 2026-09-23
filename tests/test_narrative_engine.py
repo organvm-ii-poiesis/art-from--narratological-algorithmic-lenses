@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
+from art_from_narratological_lenses.lens_renderer import LensRenderer
 from art_from_narratological_lenses.narrative_engine import (
     MODEL_NAMES,
     NARRATIVE_MODELS,
@@ -18,7 +19,6 @@ from art_from_narratological_lenses.narrative_engine import (
     NarrativeVisualizationEngine,
     StagePosition,
 )
-from art_from_narratological_lenses.lens_renderer import LensRenderer
 
 
 @pytest.fixture

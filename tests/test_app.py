@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 from flask.testing import FlaskClient
@@ -62,7 +62,7 @@ class TestAppRoutes:
         response = client.get("/api/render/kishotenketsu")
         assert response.status_code == 200
         assert response.mimetype == "image/svg+xml"
-        assert b"<g id=\"narrative-kishotenketsu\"" in response.data
+        assert b'<g id="narrative-kishotenketsu"' in response.data
 
     def test_render_model_with_lens_svg(self, client: FlaskClient) -> None:
         response = client.get("/api/render/kishotenketsu/topographic")
