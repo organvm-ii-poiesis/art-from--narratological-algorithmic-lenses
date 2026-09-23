@@ -29,6 +29,9 @@ dependencies = [
     "matplotlib>=3.8",
 ]
 
+[project.scripts]
+art-lenses = "art_from_narratological_lenses.app:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
