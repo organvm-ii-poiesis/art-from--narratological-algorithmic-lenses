@@ -5,4 +5,5 @@ display_name: Interactive web experience exploring narrative structures via visu
   algorithmic lenses
 delivery:
 - platform: web_app
-  status: not_started
+  status: active
+  url: https://organvm-ii-poiesis.github.io/art-from--narratological-algorithmic-lenses/

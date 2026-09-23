@@ -2,11 +2,17 @@
 
 **Interactive web experience exploring narrative structures via visual algorithmic lenses**
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-GitHub_Pages-blue.svg)](https://organvm-ii-poiesis.github.io/art-from--narratological-algorithmic-lenses/)
 [![CI](https://github.com/organvm-ii-poiesis/art-from--narratological-algorithmic-lenses/actions/workflows/ci.yml/badge.svg)](https://github.com/organvm-ii-poiesis/art-from--narratological-algorithmic-lenses/actions/workflows/ci.yml)
+[![Deploy](https://github.com/organvm-ii-poiesis/art-from--narratological-algorithmic-lenses/actions/workflows/deploy.yml/badge.svg)](https://github.com/organvm-ii-poiesis/art-from--narratological-algorithmic-lenses/actions/workflows/deploy.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![ORGAN-II](https://img.shields.io/badge/ORGAN-II-poiesis-purple)](https://github.com/organvm-ii-poiesis)
 
 > *Every story has a shape. The hero's journey curves like a parabola. The kishōtenketsu unfolds in four discrete panels. Ring composition folds narrative back upon itself like a palindrome. What if you could see these shapes — not as diagrams in a textbook, but as living visual structures that breathe, transform, and invite exploration?*
+
+**Hosted Live Experience**: [https://organvm-ii-poiesis.github.io/art-from--narratological-algorithmic-lenses/](https://organvm-ii-poiesis.github.io/art-from--narratological-algorithmic-lenses/)
+
+---
 
 ## Overview
 
@@ -66,22 +72,32 @@ art-from--narratological-algorithmic-lenses/
 │   └── art_from_narratological_lenses/
 │       ├── __init__.py              # Package metadata and version
 │       ├── narrative_engine.py      # Core NarrativeVisualizationEngine
-│       └── lens_renderer.py         # LensRenderer for visual transformations
+│       ├── lens_renderer.py         # LensRenderer for visual transformations
+│       ├── app.py                   # Flask interactive server & REST API
+│       └── build_site.py            # Static site generator for GitHub Pages
 ├── tests/
-│   └── test_narrative_engine.py     # Test suite (10+ tests)
-├── pyproject.toml                   # Package configuration
+│   ├── test_narrative_engine.py     # Core engine and lens test suite
+│   ├── test_app.py                  # Flask web route and API test suite
+│   └── test_smoke.py                # Deployment bundle smoke tests
+├── dist/                            # Generated web deployment bundle
+├── pyproject.toml                   # Package configuration & CLI entrypoints
 ├── LICENSE                          # MIT License
 ├── README.md                        # This document
 └── .github/
     └── workflows/
-        └── ci.yml                   # Continuous integration
+        ├── ci.yml                   # CI pipeline
+        └── deploy.yml               # GitHub Pages deployment pipeline
 ```
 
 ### Component Responsibilities
 
-- **`NarrativeVisualizationEngine`**: The core engine that models narrative structures as data objects and maps them to visual layouts. Each narrative structure (hero's journey, kishōtenketsu, ring composition, Freytag's pyramid, three-act, in medias res) is represented as a `NarrativeModel` with named stages, spatial coordinates, and visual properties. The engine provides methods to instantiate models, compute layouts, and prepare data for rendering.
+- **`NarrativeVisualizationEngine`**: The core engine that models narrative structures as data objects and maps them to visual layouts. Each narrative structure (hero's journey, kishōtenketsu, ring composition, Freytag's pyramid, three-act, in medias res) is represented as a `NarrativeModel` with named stages, spatial coordinates, and visual properties.
 
-- **`LensRenderer`**: Takes the output of the engine and applies visual transformations — color mapping, opacity gradients, animation parameters, geometric distortions. The lens metaphor is implemented here: the same narrative data looks different when passed through different rendering lenses (chromatic, topographic, temporal, relational).
+- **`LensRenderer`**: Takes the output of the engine and applies visual transformations — color mapping, opacity gradients, animation parameters, geometric distortions.
+
+- **`app.py`**: Flask web application server providing interactive web UI and API endpoints (`/api/models`, `/api/model/<name>`, `/api/render/<name>/<lens>`, `/api/transform`, `/health`).
+
+- **`build_site.py`**: Static website bundler generating `dist/` web deployment assets for GitHub Pages deployment.
 
 ### Technology Stack
 
@@ -89,9 +105,8 @@ art-from--narratological-algorithmic-lenses/
 |-----------|-----------|-----------|
 | Core modeling | Python dataclasses | Clean, typed representations of narrative structures |
 | Visual rendering | SVG generation | Programmatic control, scalable vector output |
-| Client-side interaction | D3.js (via CDN) | Standard for interactive data visualization |
-| Server | Flask | Lightweight Python web framework |
-| Static export | matplotlib | Publication-quality still images |
+| Web Application | Flask & Single Page UI | Lightweight Python web framework and responsive UI |
+| Static Deployment | GitHub Pages | Zero-maintenance hosted public reachability |
 
 ## Installation
 
@@ -124,16 +139,28 @@ python -c "from art_from_narratological_lenses.narrative_engine import Narrative
 
 ## Usage
 
-### Interactive Web Experience
+### Interactive Web Experience (Local Server)
 
 ```bash
-# Start the development server
-python -m art_from_narratological_lenses.lens_renderer
+# Start the interactive web server
+python -m art_from_narratological_lenses.app
+
+# Or use the installed CLI command
+art-lenses
 
 # Open http://localhost:5000 in your browser
 ```
 
-The web interface presents a split view: narrative structures on the left (selectable), the visualization canvas on the right. Apply different lenses using the toolbar. Load sample texts or paste your own to see how the chosen narrative structure and lens transform the content into a visual composition.
+Check server health at `http://localhost:5000/health`.
+
+### Building Static Deployment Bundle
+
+```bash
+# Generate static web bundle in dist/
+python -m art_from_narratological_lenses.build_site
+```
+
+The output in `dist/` is automatically deployed to [GitHub Pages](https://organvm-ii-poiesis.github.io/art-from--narratological-algorithmic-lenses/) via `.github/workflows/deploy.yml`.
 
 ### Programmatic Use
 
@@ -144,40 +171,38 @@ engine = NarrativeVisualizationEngine(width=1400, height=900)
 
 # Get a specific narrative model
 heros_journey = engine.get_model("heros_journey")
-print(heros_journey.stages)  # ['ordinary_world', 'call_to_adventure', ...]
+print(heros_journey.stages)
 
-# Compute the visual layout for a narrative structure
+# Compute layout and render SVG
 layout = engine.compute_layout("heros_journey")
-
-# Render as SVG
 svg = engine.render_model("heros_journey")
-
-# Render all models side by side
-comparison_svg = engine.render_comparison(["heros_journey", "kishotenketsu", "ring_composition"])
-
-# Export data for D3.js consumption
-json_data = engine.to_json("heros_journey")
 ```
 
-### Applying Lenses
+### Applying Lenses Programmatically
 
 ```python
 from art_from_narratological_lenses.lens_renderer import LensRenderer
 
 renderer = LensRenderer()
 
-# Apply different visual lenses to the same structure
-chromatic = renderer.apply_lens("chromatic", layout)    # Color-dominated
-topographic = renderer.apply_lens("topographic", layout)  # Elevation-based
-temporal = renderer.apply_lens("temporal", layout)      # Time-focused animation
-relational = renderer.apply_lens("relational", layout)  # Connection-emphasis
+# Apply different visual lenses to the layout
+chromatic = renderer.apply_lens("chromatic", layout)
+topographic = renderer.apply_lens("topographic", layout)
 ```
+
+## Verification & Smoke Checks
+
+Run the automated test suite and deployment smoke checks:
+
+```bash
+python -m pytest -v
+```
+
+This validates all core narrative engine models, lens rendering transformations, Flask API routes, static site builder bundle integrity, and SVG XML schema validity.
 
 ## Visual Design
 
 ### Color Palettes by Narrative Structure
-
-Each narrative structure has a dedicated color palette derived from its cultural and theoretical context:
 
 | Structure | Primary | Secondary | Accent | Cultural Reference |
 |-----------|---------|-----------|--------|-------------------|
@@ -187,90 +212,6 @@ Each narrative structure has a dedicated color palette derived from its cultural
 | Freytag's Pyramid | Storm grey (#4a4a5a) | Rising red (#cc3333) | Falling blue (#3366cc) | German dramatic theory |
 | Three-Act Structure | Act I green (#2d8244) | Act II amber (#d4a017) | Act III crimson (#8b1a1a) | Hollywood screenplay convention |
 | In Medias Res | Disorientation violet (#7b4bb3) | Flashback sepia (#a0845c) | Present cyan (#00a8b5) | Epic oral tradition |
-
-### Animation Philosophy
-
-Animations in this project are not decorative — they are **semantic**. Every motion communicates something about the narrative structure it represents:
-
-- The hero's journey rotates because it is a cycle
-- Kishōtenketsu's twist panel vibrates because it disrupts
-- Ring composition pulses symmetrically because it mirrors
-- Freytag's pyramid breathes (rises and falls) because it has a climax
-- Three-act structure slides horizontally because it progresses linearly
-- In medias res stutters because it begins in confusion
-
-### Lens Visual Effects
-
-Each lens transforms the same data differently:
-
-- **Chromatic lens**: Maximizes color variation; structures are distinguished primarily by hue and saturation
-- **Topographic lens**: Maps narrative tension to visual elevation; uses contour lines and relief shading
-- **Temporal lens**: Animates the structure through time; duration and pacing become visible
-- **Relational lens**: Emphasizes connections between narrative stages; uses network-like layouts with weighted edges
-
-## How It Works
-
-### Narrative Models
-
-The `NarrativeVisualizationEngine` internally represents each narrative structure as a `NarrativeModel` dataclass:
-
-```python
-NarrativeModel(
-    name="heros_journey",
-    display_name="The Hero's Journey",
-    stages=["ordinary_world", "call_to_adventure", "refusal", "meeting_mentor",
-            "crossing_threshold", "tests_allies_enemies", "approach_inmost_cave",
-            "ordeal", "reward", "road_back", "resurrection", "return_with_elixir"],
-    layout_type="circular",
-    palette=Palette(primary="#c9a227", secondary="#5c3d2e", accent="#2d5aa0"),
-    stage_connections=[(0, 11), (1, 2), ...],  # Adjacency for visual connections
-)
-```
-
-### Layout Computation
-
-The `compute_layout()` method converts a narrative model's stages into positioned visual elements:
-
-- **Circular** (hero's journey): Stages distributed evenly around a circle; departure stages in the upper hemisphere, return stages in the lower
-- **Grid** (kishōtenketsu): 2x2 grid with each cell proportioned to reflect the stage's narrative weight
-- **Concentric** (ring composition): Stages arranged as concentric rings; outermost and innermost rings mirror each other
-- **Triangular** (Freytag's pyramid): Stages positioned along a rising-then-falling path
-- **Linear** (three-act structure): Stages arranged left-to-right with proportional spacing
-- **Scattered** (in medias res): Initial positions are deliberately scrambled; animation reveals the chronological reordering
-
-### Lens Application
-
-The `LensRenderer.apply_lens()` method takes a computed layout and applies a visual transformation without modifying the underlying data. This separation of data and presentation is architecturally important — it means the same narrative model can be rendered through multiple lenses simultaneously for comparison.
-
-## Contributing
-
-Contributions are welcome in the following areas:
-
-- **New narrative structures**: Rasa theory, Propp's 31 functions, Todorov's equilibrium model, Barthes' five codes
-- **New lenses**: Spatial-audio lens (sonification), haptic lens (vibration patterns for accessibility), semantic-zoom lens
-- **Accessibility**: Screen reader descriptions of visual narrative structures; keyboard navigation
-- **Corpus integration**: Connecting to real texts (Project Gutenberg, etc.) for live narrative analysis
-
-### Development Setup
-
-```bash
-pip install -e ".[dev]"
-pytest tests/ -v
-```
-
-### Code Style
-
-PEP 8 with type hints. Use `ruff` for linting:
-
-```bash
-ruff check src/ tests/
-```
-
-## Related Projects
-
-- [`narratological-algorithmic-lenses`](https://github.com/organvm-i-theoria/narratological-algorithmic-lenses) — The ORGAN-I theoretical source that this project visualizes
-- [`metasystem-master`](https://github.com/organvm-ii-poiesis/metasystem-master) — The ORGAN-II flagship generative art system
-- [`art-from--auto-revision-epistemic-engine`](https://github.com/organvm-ii-poiesis/art-from--auto-revision-epistemic-engine) — Sibling ORGAN-II project visualizing governance structures
 
 ## License
 
