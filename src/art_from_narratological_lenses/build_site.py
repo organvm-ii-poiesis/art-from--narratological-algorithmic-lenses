@@ -6,7 +6,6 @@ Generates deployable web assets for GitHub Pages deployment in `dist/`.
 from __future__ import annotations
 
 import json
-import os
 import shutil
 from pathlib import Path
 

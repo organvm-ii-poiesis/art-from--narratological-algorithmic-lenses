@@ -7,10 +7,9 @@ and visual algorithmic lenses.
 from __future__ import annotations
 
 import argparse
-import os
 from typing import Any
 
-from flask import Flask, Response, jsonify, request
+from flask import Flask, jsonify, request
 
 from art_from_narratological_lenses.lens_renderer import LENS_CONFIGS, LensRenderer
 from art_from_narratological_lenses.narrative_engine import (
